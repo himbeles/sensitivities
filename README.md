@@ -1,6 +1,6 @@
 # stochastic-arguments
 A Python function decorator which adds Gaussian noise to function input parameters.
-It can be useful for stochastic Monte Carlo) error propagation.
+It can be useful for stochastic (Monte Carlo) error propagation.
 
 ## Usage
 Put the function decorator `@gaussian_argument_variation` in front of a function definition in order to introduce Gaussian noise on the function input parameters, e.g., 
