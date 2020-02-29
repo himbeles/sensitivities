@@ -13,8 +13,13 @@ def func(a,b,k):
     return …
 ```
 
-Then, instead of the regular return value, 
-the function returns a list of `n=10` return values for the stochastically varied inputs `a` and `k`. 
+Then, instead of the regular return value, the function returns a list of `n=10` return values for the stochastically varied inputs `a` and `k`. 
+
+The decorator can also be applied to existing functions directly, as in 
+```python
+gaussian_argument_variation(std={"a":0.5, "k":0.1}, n=10)(func)(1,2,k=7)
+```
+
 It also works for arbitrary matrix-shaped in- and outputs. 
 
 See also the Jupyter notebook [gaussian_argument_variation.ipynb](gaussian_argument_variation.ipynb) for usage examples.
