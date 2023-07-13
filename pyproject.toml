@@ -1,0 +1,16 @@
+[project]
+name = "sensitivity"
+version = "1.0.0"
+requires-python = ">=3.10"
+
+dependencies = [
+    "numpy",
+    "jax[cpu]"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "matplotlib"
+]
