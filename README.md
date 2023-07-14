@@ -11,6 +11,10 @@ pip install sensitivity
 
 ## Usage
 
+
+### sensitivity.stochastic
+
 The `sensitivity.stochastic` module provides functionality for stochastic sensitivity analysis. It allows you to stochastically sample input parameters from various distributions and evaluate the sensitivity of a function to those inputs.
 
 
+### sensitivity.linear

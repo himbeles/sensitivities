@@ -1,8 +1,15 @@
-import numpy as np
 from abc import ABC, abstractmethod
 from inspect import getfullargspec
-from typing import Callable, List, Dict, Union
+from typing import Callable, Dict, List, Union
 
+import numpy as np
+
+
+def seed(seed):
+    """
+    Seed the random number generator.
+    """
+    np.random.seed(seed)
 
 class Distribution(ABC):
     """
@@ -92,7 +99,6 @@ def sample(
     distributions_list: List[_DistributionOrValue] | None = [],
     distributions_dict: Dict[str, _DistributionOrValue] | None = {},
     n: int = 100,
-    use_jit: bool = False,
 ) -> List:
     """
     Sample output values from a function. Each function argument is stochastically
@@ -108,7 +114,6 @@ def sample(
             function, and the values are Distribution instances or fixed values. If a fixed value is
             provided, it will be treated as a Fixed Distribution. Defaults to an empty dictionary.
         n: The number of samples to draw from the function. Defaults to 100.
-        use_jit: If set to True, the function uses JAX's JIT compilation. Defaults to False.
 
     Returns:
         A list of function return values for the stochastically varied inputs.
@@ -119,10 +124,6 @@ def sample(
             positional parameters in the function, or if some keys in the distributions
             dictionary do not match parameter names in the function.
     """
-
-    if use_jit:
-        from jax import jit
-        f = jit(f)
 
     def convert_to_dist(d):
         if isinstance(d, Distribution):
