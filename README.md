@@ -16,21 +16,32 @@ pip install sensitivity
 
 ### `sensitivity.stochastic`
 
-The `sensitivity.stochastic` module provides functionality for stochastic sensitivity analysis. It allows you to stochastically sample input parameters from various distributions and evaluate the sensitivity of a function to those inputs.
+The `sensitivity.stochastic` module provides functionality for stochastic sensitivity analysis. It allows you to stochastically sample input parameters from various distributions and evaluate the sensitivity of a function to those inputs. Available distributions are 
+- Gaussian (given mean and standard deviation)
+- Uniform (between lower and upper bound)
+- Discrete (multiple discrete options)
 
 Example for stochastic sampling:
 
 ```python
-from sensitivity.stochastic import sample, Gaussian, Uniform
+from sensitivity.stochastic import sample, Gaussian, Uniform, Discrete, seed
+import matplotlib.pyplot as plt
 
-def my_function(x, y):
-    return x + y
+def my_function(a, b, c=0, d=0):
+    return a + b + c + d
 
-samples = sample(my_function, [Gaussian(0, 0.03), Uniform(-1, 1)], n=100)
+samples = sample(
+    my_function,
+    [Gaussian(10, 0.05), Discrete([1, 2])],
+    {"c": Uniform(-0.4, 0.4), "d": -10},
+    n=100000,
+)
 
-# Perform sensitivity analysis on the samples
-# ...
+plt.hist(samples, 100)
+plt.show()
 ```
+
+![](doc/images/hist_bimodal.png)
 
 
 ### `sensitivity.linear`

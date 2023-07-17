@@ -22,7 +22,7 @@ def propagate_errors(
 
     Args:
         f (function): The function for which the propagation of errors 
-            is to be calculated.
+            is calculated.
         errors: Uncertainties in the arguments of f. 
             Each uncertainty corresponds to a single argument of f.
         x0: Initial values for the arguments of f. 
