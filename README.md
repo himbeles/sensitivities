@@ -1,22 +1,22 @@
-# Sensitivity
+# sensitivities
 
-Methods for linear and stochastic sensitivity analysis and error propagation.
+Methods for linear and stochastic sensitivities analysis and error propagation.
 
 ## Install
 
-You can install the `sensitivity` module using pip:
+You can install the `sensitivities` module using pip:
 
 ```shell
-pip install sensitivity
+pip install sensitivities
 ```
 
 
 ## Usage
 
 
-### `sensitivity.stochastic`
+### `sensitivities.stochastic`
 
-The `sensitivity.stochastic` module provides functionality for stochastic sensitivity analysis. It allows you to stochastically sample input parameters from various distributions and evaluate the sensitivity of a function to those inputs. Available distributions are 
+The `sensitivities.stochastic` module provides functionality for stochastic sensitivities analysis. It allows you to stochastically sample input parameters from various distributions and evaluate the sensitivities of a function to those inputs. Available distributions are 
 - Gaussian (given mean and standard deviation)
 - Uniform (between lower and upper bound)
 - Discrete (multiple discrete options)
@@ -24,7 +24,7 @@ The `sensitivity.stochastic` module provides functionality for stochastic sensit
 Example for stochastic sampling:
 
 ```python
-from sensitivity.stochastic import sample, Gaussian, Uniform, Discrete, seed
+from sensitivities.stochastic import sample, Gaussian, Uniform, Discrete, seed
 import matplotlib.pyplot as plt
 
 def my_function(a, b, c=0, d=0):
@@ -44,14 +44,14 @@ plt.show()
 ![](doc/images/hist_bimodal.png)
 
 
-### `sensitivity.linear`
+### `sensitivities.linear`
 
 This module contains the `propagate_errors` function for linear propagation of errors for a given function based on the principle of differentials. It makes use of the scipy function `approx_fprime` to calculate the partial derivatives of the given function. The propagated error is calculated by taking the square root of the sum of squares of the product of the partial derivatives and the uncertainties.
 
 Here is a simple usage example:
 
 ```python
-from sensitivity.linear import propagate_errors
+from sensitivities.linear import propagate_errors
 
 def my_function(x, y):
     return [x ** 2, y]

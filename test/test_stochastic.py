@@ -1,4 +1,4 @@
-from sensitivity.stochastic import sample, Gaussian, Uniform, Discrete, seed
+from sensitivities.stochastic import sample, Gaussian, Uniform, Discrete, seed
 import pytest
 import numpy as np
 

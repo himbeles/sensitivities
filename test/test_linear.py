@@ -1,5 +1,5 @@
 import numpy as np
-from sensitivity.linear import propagate_errors
+from sensitivities.linear import propagate_errors
 
 def my_function(x, y):
     return [x ** 2, y]
