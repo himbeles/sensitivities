@@ -13,9 +13,6 @@ on:
   release:
     types: [published]
 
-permissions:
-  contents: read
-
 jobs:
   pypi-publish:
     name: upload release to PyPI
@@ -27,6 +24,5 @@ jobs:
       id-token: write
     steps:
       # retrieve your distributions here
-
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
