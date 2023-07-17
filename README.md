@@ -10,9 +10,7 @@ You can install the `sensitivities` module using pip:
 pip install sensitivities
 ```
 
-
 ## Usage
-
 
 ### `sensitivities.stochastic`
 
