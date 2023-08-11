@@ -28,7 +28,6 @@ dev = [
 ]
 
 [tool.setuptools_scm]
-version_file = "sensitivities/_version.py"
 
 [project.urls]
 homepage = "https://github.com/himbeles/sensitivities"
