@@ -1,6 +1,9 @@
+# pyproject.toml
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+
 [project]
 name = "sensitivities"
-version = "1.0.0"
 requires-python = ">=3.10"
 description = "Linear and stochastic sensitivity analysis and error propagation"
 readme = "README.md"
@@ -9,6 +12,7 @@ authors = [
     {name = "Luis Riegger"},
     {email = "lri@me.com"}
 ]
+dynamic = ["version"]
 
 dependencies = [
     "numpy",
@@ -22,6 +26,9 @@ dev = [
     "black",
     "matplotlib"
 ]
+
+[tool.setuptools_scm]
+version_file = "sensitivities/_version.py"
 
 [project.urls]
 homepage = "https://github.com/himbeles/sensitivities"
