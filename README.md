@@ -10,6 +10,7 @@ You can install the `sensitivities` module using pip:
 pip install sensitivities
 ```
 
+
 ## Usage
 
 ### `sensitivities.stochastic`
@@ -62,3 +63,13 @@ This will output:
 ```python
 np.array([0.2, 0.2])
 ```
+
+
+## Development
+
+Setup development environment
+
+```shell
+uv sync --extra dev
+```
+
