@@ -36,7 +36,7 @@ samples = sample(
     n=100000,
 )
 
-plt.hist(samples, 100)
+plt.hist(np.array(samples), 100)
 plt.show()
 ```
 

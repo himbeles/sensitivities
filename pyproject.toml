@@ -19,14 +19,14 @@ dependencies = [
     "scipy",
 ]
 
-[project.optional-dependencies]
+[tool.setuptools_scm]
+
+[dependency-groups]
 dev = [
-    "build",
+    "seaborn>=0.13.2",
     "pytest",
     "matplotlib"
 ]
-
-[tool.setuptools_scm]
 
 [project.urls]
 homepage = "https://github.com/himbeles/sensitivities"

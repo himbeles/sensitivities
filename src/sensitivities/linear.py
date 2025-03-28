@@ -2,6 +2,8 @@ import numpy as np
 import numpy.typing as npt
 from scipy.optimize import approx_fprime
 
+from .math import is_valid_correlation_matrix
+
 _epsilon = np.sqrt(np.finfo(float).eps)
 
 
@@ -74,7 +76,7 @@ def propagate_errors(
                 "Correlation matrix must be square with dimensions equal to the length of errors."
             )
         # assert correlation matrix is symmetric and positive definite
-        if not np.allclose(corr, corr.T) or not np.all(np.linalg.eigvals(corr) >= 0):
+        if not is_valid_correlation_matrix(corr):
             raise ValueError(
                 "Correlation matrix must be symmetric and positive semi-definite."
             )
