@@ -25,7 +25,8 @@ dependencies = [
 dev = [
     "seaborn>=0.13.2",
     "pytest",
-    "matplotlib"
+    "matplotlib",
+    "ipykernel>=6.29.5",
 ]
 
 [project.urls]
