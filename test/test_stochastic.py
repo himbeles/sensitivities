@@ -3,12 +3,12 @@ import pytest
 
 from sensitivities.stochastic import Discrete, Gaussian, Uniform, sample
 
-seed=0
+seed = 0
+
 
 def test_gaussian():
     def my_function(a):
         return a
-
 
     samples = sample(
         my_function,

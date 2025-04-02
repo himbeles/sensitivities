@@ -31,6 +31,7 @@ class Distribution(ABC):
         """
         ...
 
+
 class Fixed(Distribution):
     """
     Represents a fixed value distribution. This class is a wrapper for non-stochastic, fixed inputs.
@@ -41,15 +42,16 @@ class Fixed(Distribution):
 
     def __init__(self, value):
         self.value = value
-    
+
     def sample(self, n=1):
         return np.full(n, self.value)
-    
+
     def std(self):
         return 0
-    
+
     def mean(self):
         return self.value
+
 
 class Gaussian(Distribution):
     """
@@ -68,12 +70,13 @@ class Gaussian(Distribution):
 
     def sample(self, n=1):
         return self.rng.normal(self._mean, self._std, n)
-    
+
     def std(self):
         return self._std
-    
+
     def mean(self):
         return self._mean
+
 
 class Uniform(Distribution):
     """
@@ -92,12 +95,13 @@ class Uniform(Distribution):
 
     def sample(self, n=1):
         return self.rng.uniform(self.low, self.high, n)
-    
+
     def std(self):
         return (self.high - self.low) / np.sqrt(12)
-    
+
     def mean(self):
         return (self.high + self.low) / 2
+
 
 class Discrete(Distribution):
     """
@@ -114,12 +118,13 @@ class Discrete(Distribution):
 
     def sample(self, n=1):
         return self.rng.choice(self.options, n)
-    
+
     def std(self):
         return np.std(self.options)
-    
+
     def mean(self):
         return np.mean(self.options)
+
 
 _DistributionOrValue = Union[Distribution, int, float, np.ndarray]
 
@@ -193,25 +198,31 @@ def sample(
     if corr is not None:
         if isinstance(corr, list):
             corr_matrix = np.eye(num_dist)
-            param_to_idx = {name: idx for idx, name in enumerate(param_names[:num_dist])}
+            param_to_idx = {
+                name: idx for idx, name in enumerate(param_names[:num_dist])
+            }
             for a, b, val in corr:
                 i, j = param_to_idx[a], param_to_idx[b]
                 corr_matrix[i, j] = corr_matrix[j, i] = val
         elif isinstance(corr, np.ndarray):
-            if corr.shape != (num_dist,num_dist):
+            if corr.shape != (num_dist, num_dist):
                 raise ValueError(
-                    "Correlation matrix must be square with dimensions equal to the length of errors."
+                    "Correlation matrix must be square with dimensions equal to the length of uncertainties."
                 )
             corr_matrix = corr
         else:
-            raise TypeError("corr must be either a correlation matrix or a list of tuples")
+            raise TypeError(
+                "corr must be either a correlation matrix or a list of tuples"
+            )
 
-
-        samples = sample_distributions(all_distributions, n, corr_matrix)  
+        samples = sample_distributions(all_distributions, n, corr_matrix)
         res_list = []
         for j in range(n):
-            new_args = list(samples[j,:len(distributions_list)])
-            new_kwargs = {k: samples[j,len(distributions_list)+i] for i,k in enumerate(distributions_dict.keys())}
+            new_args = list(samples[j, : len(distributions_list)])
+            new_kwargs = {
+                k: samples[j, len(distributions_list) + i]
+                for i, k in enumerate(distributions_dict.keys())
+            }
             res_list.append(f(*new_args, **new_kwargs))
         return res_list
 
@@ -224,7 +235,12 @@ def sample(
         return res_list
 
 
-def sample_distributions(distributions: Sequence[Distribution], n: int = 100, corr: npt.ArrayLike | None = None, seed=None):
+def sample_distributions(
+    distributions: Sequence[Distribution],
+    n: int = 100,
+    corr: npt.ArrayLike | None = None,
+    seed=None,
+):
     """
     Sample values from a list of distributions.
 
@@ -239,27 +255,29 @@ def sample_distributions(distributions: Sequence[Distribution], n: int = 100, co
         A list of samples from the distributions.
     """
     num_dist = len(distributions)
-    samples = np.empty((n,num_dist))
+    samples = np.empty((n, num_dist))
     dist_ind_without_correlation = set(range(num_dist))
 
     if corr is not None and not np.allclose(corr, np.eye(num_dist, num_dist)):
         if corr.shape != (num_dist, num_dist):
             raise ValueError(
-                "Correlation matrix must be square with dimensions equal to the length of errors."
+                "Correlation matrix must be square with dimensions equal to the length of uncertainties."
             )
         # assert correlation matrix is symmetric and positive definite
         if not is_valid_correlation_matrix(corr):
             raise ValueError(
                 "Correlation matrix must be symmetric and positive semi-definite."
             )
-        
+
         # check that correlation is only non-zero between uniform and gaussians distributions
-        allowed_distributions = (Uniform,Gaussian)
+        allowed_distributions = (Uniform, Gaussian)
         dist_ind_with_correlation = set()
         for i in range(num_dist):
-            for j in range(i+1, num_dist):
+            for j in range(i + 1, num_dist):
                 if corr[i, j] != 0:
-                    if not isinstance(distributions[i], allowed_distributions) or not isinstance(distributions[j], allowed_distributions):
+                    if not isinstance(
+                        distributions[i], allowed_distributions
+                    ) or not isinstance(distributions[j], allowed_distributions):
                         raise ValueError(
                             "Correlation can only be non-zero between uniform and gaussian distributions."
                         )
@@ -269,13 +287,15 @@ def sample_distributions(distributions: Sequence[Distribution], n: int = 100, co
         # sub-correlation-matrix to be used for multivariate copula method
         dist_ind_without_correlation.difference_update(dist_ind_with_correlation)
         dist_ind_with_correlation = tuple(sorted(dist_ind_with_correlation))
-        corr_red = corr[np.ix_(dist_ind_with_correlation,dist_ind_with_correlation)]
+        corr_red = corr[np.ix_(dist_ind_with_correlation, dist_ind_with_correlation)]
         n_red = len(corr_red)
 
         rng = np.random.default_rng(seed)
 
         # make basis multivariate normal distributions (mean=0, sigma=1)
-        basis_normal = rng.multivariate_normal(mean=np.zeros(n_red), cov=corr_red, size=n)
+        basis_normal = rng.multivariate_normal(
+            mean=np.zeros(n_red), cov=corr_red, size=n
+        )
 
         # convert to copula: uniform multivariate distribution
         basis_uniform = scipy.stats.norm.cdf(basis_normal)
@@ -290,11 +310,12 @@ def sample_distributions(distributions: Sequence[Distribution], n: int = 100, co
                     )
                 case Uniform():
                     samples[:, i] = scipy.stats.uniform.ppf(
-                        basis_uniform[:, i_red], loc=dist.low, scale=dist.high - dist.low
+                        basis_uniform[:, i_red],
+                        loc=dist.low,
+                        scale=dist.high - dist.low,
                     )
                 case _:
                     raise ValueError(f"Unsupported distribution: {dist}")
-
 
     for i in dist_ind_without_correlation:
         dist = distributions[i]
