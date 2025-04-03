@@ -2,7 +2,8 @@ import numpy as np
 
 
 def is_valid_correlation_matrix(matrix: np.ndarray) -> bool:
-    return np.all(np.linalg.eigvals(matrix) >= 0) and np.allclose(matrix, matrix.T)
+    vals = np.linalg.eigvals(matrix)
+    return np.all(np.isclose(vals, 0) | (vals > 0)) and np.allclose(matrix, matrix.T)
 
 
 def correlation_to_covariance(correlation_matrix, uncertainties):
