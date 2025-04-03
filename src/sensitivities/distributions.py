@@ -80,6 +80,10 @@ class Gaussian(Distribution):
     """
 
     def __init__(self, mean: float, sigma: float, seed=None):
+        if sigma < 0:
+            raise ValueError(
+                "The standard deviation `sigma` must be larger or equal zero."
+            )
         self._mean = mean
         self._std = sigma
         self.rng = np.random.default_rng(seed)
@@ -105,6 +109,10 @@ class Uniform(Distribution):
     """
 
     def __init__(self, low: float, high: float, seed=None):
+        if low > high:
+            raise ValueError(
+                "The `low` must be below or equal the `high` bound value for the uniform distribution."
+            )
         self.low = low
         self.high = high
         self.rng = np.random.default_rng(seed)
