@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from inspect import getfullargspec
 from typing import Callable, Dict, List, Sequence, Union
 
@@ -7,152 +6,42 @@ import numpy.typing as npt
 import scipy.stats
 
 from .math import is_valid_correlation_matrix
-
-
-class Distribution(ABC):
-    """
-    Abstract base class for all distribution types. Outlines the necessary method for
-    subclasses.
-
-    Methods:
-        sample: Draws a single sample from the distribution. Must be implemented in any subclass.
-    """
-
-    @abstractmethod
-    def sample(self, n=1):
-        """
-        Draws samples from the distribution.
-
-        Args:
-            n: The number of samples to draw. Defaults to 1.
-
-        Returns:
-            A sample or samples from the distribution.
-        """
-        ...
-
-
-class Fixed(Distribution):
-    """
-    Represents a fixed value distribution. This class is a wrapper for non-stochastic, fixed inputs.
-
-    Args:
-        value: The fixed value for the distribution.
-    """
-
-    def __init__(self, value):
-        self.value = value
-
-    def sample(self, n=1):
-        return np.full(n, self.value)
-
-    def std(self):
-        return 0
-
-    def mean(self):
-        return self.value
-
-
-class Gaussian(Distribution):
-    """
-    Represents a Gaussian distribution.
-
-    Args:
-        mean: The mean of the Gaussian distribution.
-        sigma: The standard deviation of the Gaussian distribution.
-        seed: The seed for the random number generator.
-    """
-
-    def __init__(self, mean, sigma, seed=None):
-        self._mean = mean
-        self._std = sigma
-        self.rng = np.random.default_rng(seed)
-
-    def sample(self, n=1):
-        return self.rng.normal(self._mean, self._std, n)
-
-    def std(self):
-        return self._std
-
-    def mean(self):
-        return self._mean
-
-
-class Uniform(Distribution):
-    """
-    Represents a Uniform distribution.
-
-    Args:
-        low: The lower bound of the Uniform distribution.
-        high: The upper bound of the Uniform distribution.
-        seed: The seed for the random number generator.
-    """
-
-    def __init__(self, low, high, seed=None):
-        self.low = low
-        self.high = high
-        self.rng = np.random.default_rng(seed)
-
-    def sample(self, n=1):
-        return self.rng.uniform(self.low, self.high, n)
-
-    def std(self):
-        return (self.high - self.low) / np.sqrt(12)
-
-    def mean(self):
-        return (self.high + self.low) / 2
-
-
-class Discrete(Distribution):
-    """
-    Represents a discrete distribution with a fixed set of options.
-
-    Args:
-        options: The list of options from which to draw samples.
-        seed: The seed for the random number generator.
-    """
-
-    def __init__(self, options, seed=None):
-        self.options = options
-        self.rng = np.random.default_rng(seed)
-
-    def sample(self, n=1):
-        return self.rng.choice(self.options, n)
-
-    def std(self):
-        return np.std(self.options)
-
-    def mean(self):
-        return np.mean(self.options)
-
-
-_DistributionOrValue = Union[Distribution, int, float, np.ndarray]
+from .distributions import (
+    Distribution,
+    Gaussian,
+    Uniform,
+    Discrete,
+    Fixed,
+    _DistributionOrValue,
+)
 
 
 def sample(
     f: Callable,
-    distributions_list: List[_DistributionOrValue] | None = [],
-    distributions_dict: Dict[str, _DistributionOrValue] | None = {},
-    n: int = 100,
+    distributions_args: list[_DistributionOrValue] = [],
+    distributions_kwargs: dict[str, _DistributionOrValue] = {},
     corr: Union[np.ndarray, list[tuple[str, str, float]], None] = None,
+    n: int = 100,
 ) -> List:
     """
     Sample output values from a function. Each function argument is stochastically
-    sampled from a provided distribution, optionally considering correlations between input distributions.
+    sampled from a provided distribution, optionally considering correlations
+        between input distributions.
 
     Args:
         f: The function to sample.
-        distributions_list: A list of Distribution instances or fixed values for each positional
+        distributions_args: A list of Distribution instances or fixed values for each positional
             argument of the function. The order should match the order of the function's positional
             arguments. If a fixed value is provided, it will be treated as a Fixed Distribution.
             Defaults to an empty list.
-        distributions_dict: A dictionary where the keys are the names of keyword arguments in the
-            function, and the values are Distribution instances or fixed values. If a fixed value is
-            provided, it will be treated as a Fixed Distribution. Defaults to an empty dictionary.
-        n: The number of samples to draw from the function. Defaults to 100.
+        distributions_kwargs: A dictionary where the keys are the names of keyword arguments in the
+            function, and the values are Distribution instances or fixed values for these keyword arguments.
+            If a scalar value is provided, it will be treated as a Fixed Distribution.
+            Defaults to an empty dictionary.
         corr: Optional correlation specification. Either:
             - A correlation matrix (numpy.ndarray) of shape (num_args, num_args), or
             - A list of tuples specifying correlations as (arg1, arg2, correlation_value).
+        n: The number of samples to draw from the function. Defaults to 100.
 
     Returns:
         A list of function return values for the stochastically varied inputs.
@@ -172,8 +61,10 @@ def sample(
         else:
             raise TypeError("Unsupported type in distributions list")
 
-    distributions_list = [convert_to_dist(d) for d in distributions_list]
-    distributions_dict = {k: convert_to_dist(v) for k, v in distributions_dict.items()}
+    distributions_list = [convert_to_dist(d) for d in distributions_args]
+    distributions_dict = {
+        k: convert_to_dist(v) for k, v in distributions_kwargs.items()
+    }
     all_distributions = distributions_list + list(distributions_dict.values())
     num_dist = len(all_distributions)
 
@@ -198,9 +89,7 @@ def sample(
     if corr is not None:
         if isinstance(corr, list):
             corr_matrix = np.eye(num_dist)
-            param_to_idx = {
-                name: idx for idx, name in enumerate(param_names[:num_dist])
-            }
+            param_to_idx = {name: idx for idx, name in enumerate(param_names)}
             for a, b, val in corr:
                 i, j = param_to_idx[a], param_to_idx[b]
                 corr_matrix[i, j] = corr_matrix[j, i] = val
@@ -259,6 +148,7 @@ def sample_distributions(
     dist_ind_without_correlation = set(range(num_dist))
 
     if corr is not None and not np.allclose(corr, np.eye(num_dist, num_dist)):
+        corr = np.asarray(corr)
         if corr.shape != (num_dist, num_dist):
             raise ValueError(
                 "Correlation matrix must be square with dimensions equal to the length of uncertainties."

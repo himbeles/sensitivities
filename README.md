@@ -1,6 +1,8 @@
 # sensitivities
 
-Methods for linear and stochastic sensitivities analysis and uncertainty propagation.
+(L. Riegger, 2025)
+
+Methods for linear and stochastic sensitivities analysis and uncertainty propagation, following the BIPM GUM (JCGM 102:2011).
 
 ## Install
 
@@ -15,7 +17,7 @@ pip install sensitivities
 
 ### `sensitivities.stochastic`
 
-The `sensitivities.stochastic` module provides functionality for stochastic sensitivities analysis. It allows you to stochastically sample input parameters from various distributions and evaluate the sensitivities of a function to those inputs. Available distributions are 
+The `sensitivities.stochastic` module provides functionality for stochastic sensitivity analysis. It allows you to stochastically sample input parameters from various, potentially correlated distributions and evaluate the sensitivities of a function to those inputs. Available distributions are 
 - Gaussian (given mean and standard deviation)
 - Uniform (between lower and upper bound)
 - Discrete (multiple discrete options)
@@ -23,16 +25,21 @@ The `sensitivities.stochastic` module provides functionality for stochastic sens
 Example for stochastic sampling:
 
 ```python
-from sensitivities.stochastic import sample, Gaussian, Uniform, Discrete, seed
+from sensitivities.stochastic import sample, Gaussian, Uniform, Discrete
 import matplotlib.pyplot as plt
 
 def my_function(a, b, c=0, d=0):
     return a + b + c + d
 
+
 samples = sample(
     my_function,
-    [Gaussian(10, 0.05), Discrete([1, 2])],
-    {"c": Uniform(-0.4, 0.4), "d": -10},
+    [
+        Gaussian(10, 0.05),
+        Discrete([1, 2]),
+    ],
+    {"c": Uniform(-0.4, 0.4), "d": -100},
+    corr=[("a", "c", 0.5)],
     n=100000,
 )
 
@@ -58,7 +65,7 @@ def my_function(x, y):
 print(propagate_uncertainties(my_function, uncertainties=[0.1, 0.2], x0=[1, 1]))
 ```
 
-This will output:
+This will output the propagated standard uncertainties and correlation matrix between the function outputs:
 
 ```python
 (
