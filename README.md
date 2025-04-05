@@ -1,4 +1,4 @@
-[![Tests](https://github.com/himbeles/sensitivities/actions/workflows/test.yml/badge.svg)](https://github.com/himbeles/sensitivities/actions/workflows/test.yml)
+[![Tests](https://github.com/himbeles/sensitivities/actions/workflows/tests.yml/badge.svg)](https://github.com/himbeles/sensitivities/actions/workflows/tests.yml)
 
 # sensitivities
 
