@@ -1,3 +1,5 @@
+[![Tests](https://github.com/himbeles/sensitivities/actions/workflows/test.yml/badge.svg)](https://github.com/himbeles/sensitivities/actions/workflows/test.yml)
+
 # sensitivities
 
 (L. Riegger, 2025)
