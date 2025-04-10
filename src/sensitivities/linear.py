@@ -6,9 +6,6 @@ from scipy.optimize import approx_fprime
 
 from .distributions import (
     Distribution,
-    Gaussian,
-    Uniform,
-    Discrete,
     Fixed,
     _DistributionOrValue,
 )
@@ -224,6 +221,8 @@ def propagate_uncertainty_distributions(
             raise TypeError(
                 "corr must be either a correlation matrix or a list of tuples"
             )
+    else:
+        corr_matrix = None
 
     # mean and standard uncertainties for input distributions
     uncertainties = np.asarray([dist.std() for dist in all_distributions])
