@@ -11,6 +11,7 @@ from .distributions import (
     Gaussian,
     Uniform,
     Discrete,
+    Sinusoidal,
     Fixed,
     _DistributionOrValue,
 )
@@ -160,7 +161,7 @@ def sample_distributions(
             )
 
         # check that correlation is only non-zero between uniform and gaussians distributions
-        allowed_distributions = (Uniform, Gaussian)
+        allowed_distributions = (Uniform, Gaussian, Sinusoidal)
         dist_ind_with_correlation = set()
         for i in range(num_dist):
             for j in range(i + 1, num_dist):
@@ -169,7 +170,7 @@ def sample_distributions(
                         distributions[i], allowed_distributions
                     ) or not isinstance(distributions[j], allowed_distributions):
                         raise ValueError(
-                            "Correlation can only be non-zero between uniform and gaussian distributions."
+                            "Correlation can only be non-zero between uniform, gaussian, and sinusoidal distributions."
                         )
                     dist_ind_with_correlation.add(i)
                     dist_ind_with_correlation.add(j)
@@ -204,6 +205,8 @@ def sample_distributions(
                         loc=dist.low,
                         scale=dist.high - dist.low,
                     )
+                case Sinusoidal():
+                    samples[:, i] = dist.amplitude * -np.cos(np.pi*basis_uniform[:, i_red]) + dist.offset
                 case _:
                     raise ValueError(f"Unsupported distribution: {dist}")
 
