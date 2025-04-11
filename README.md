@@ -23,6 +23,7 @@ The `sensitivities.stochastic` module provides functionality for stochastic sens
 - Gaussian (given mean and standard deviation)
 - Uniform (between lower and upper bound)
 - Discrete (multiple discrete options)
+- Sinusoidal (bimodal sine amplitude distribution)
 
 Example for stochastic sampling:
 
